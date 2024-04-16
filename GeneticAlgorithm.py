@@ -2,7 +2,7 @@ import random
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-class Parameters:
+class Parametery:
     # Simulation parameters
     lp = 40  # Number of generations in the experiment
     a1 = 1.0  # Initial value of the search space
@@ -15,49 +15,49 @@ class Parameters:
     pm = 0.01  # Mutation probability
     wykres= [0]*(lp+1)
     counter=0
-class BaseNumbers:
-    tablica_bazowa = [random.randint(0, 255) for _ in range(100 * Parameters.lp)]
+class NumeryBazowe:
+    tablica_bazowa = [random.randint(0, 255) for _ in range(100 * Parametery.lp)]
     index_bazowy = 0
 
     @staticmethod
     def pobierz_bazowa():
-        BaseNumbers.index_bazowy += 1
-        return BaseNumbers.tablica_bazowa[BaseNumbers.index_bazowy - 1]
+        NumeryBazowe.index_bazowy += 1
+        return NumeryBazowe.tablica_bazowa[NumeryBazowe.index_bazowy - 1]
 
     @staticmethod
     def power():
-        # Calculate the N-th non-negative power of two
+        # liczy potege dla systemu dziesietkowegoo
         power = 1
-        for _  in range(Parameters.N):
+        for _  in range(Parametery.N):
             power *= 2
         return power
 
 class Population:
     def __init__(self):
-        self.populacja = [[random.randint(0, 1) for _ in range(Parameters.N)] for _ in range(Parameters.pula)]
-        self.tablica_fenotypow = [0] * Parameters.pula
-        self.power = BaseNumbers.power()
-        self.tablica_dostosowanie = [0] * Parameters.pula
+        self.populacja = [[random.randint(0, 1) for _ in range(Parametery.N)] for _ in range(Parametery.pula)]
+        self.tablica_fenotypow = [0] * Parametery.pula
+        self.power = NumeryBazowe.power()
+        self.tablica_dostosowanie = [0] * Parametery.pula
 
     def losuj_populacje(self):
-        for i in range(Parameters.pula):
-            for j in range(Parameters.N):
+        for i in range(Parametery.pula):
+            for j in range(Parametery.N):
                 self.populacja[i][j] = random.randint(0, 1)
 
     def oblicz_fenotypy(self,a,b):
-        for pozycja in range(Parameters.pula):
+        for pozycja in range(Parametery.pula):
             self.tablica_fenotypow[pozycja] = a + (b - a) * self.oblicz_fenotyp_chromosomu(pozycja) / self.power
 
     def oblicz_fenotyp_chromosomu(self, pozycja_chromosomu):
         fenotyp = 0
         rat = 1
-        for j in range(Parameters.N):
+        for j in range(Parametery.N):
             fenotyp += self.populacja[pozycja_chromosomu][j] * rat
             rat *= 2
         return fenotyp
 
     def oblicz_dostosowanie(self,tablica_fenotypowY):
-        for i in range(Parameters.pula):
+        for i in range(Parametery.pula):
             x = self.tablica_fenotypow[i]
             y= tablica_fenotypowY[i]
             self.tablica_dostosowanie[i] = 1-math.log(x**2+math.cos(y),10)
@@ -65,8 +65,8 @@ class Population:
     def dostosowanie_normalizacja(self):
         min_val = min(self.tablica_dostosowanie)
         max_val = max(self.tablica_dostosowanie)
-        offset = (max_val - min_val) / (Parameters.N - 1) - min_val
-        for i in range(Parameters.pula):
+        offset = (max_val - min_val) / (Parametery.N - 1) - min_val
+        for i in range(Parametery.pula):
             self.tablica_dostosowanie[i] += offset
 
     def ruletka(self):
@@ -74,17 +74,17 @@ class Population:
         suma_dostosowanie = sum(self.tablica_dostosowanie)
 
         tablica_NI = [dostosowanie / suma_dostosowanie * self.power for dostosowanie in self.tablica_dostosowanie]
-        losowe = [random.randint(0, self.power - 1) for _ in range(Parameters.pula)]
-        ruletka = [0] * Parameters.pula
+        losowe = [random.randint(0, self.power - 1) for _ in range(Parametery.pula)]
+        ruletka = [0] * Parametery.pula
 
         pozycja = 0
-        for i in range(Parameters.pula):
+        for i in range(Parametery.pula):
             pozycja += tablica_NI[i]
             ruletka[i] = pozycja
 
-        nowe_pokolenie = [[0] * Parameters.N for _ in range(Parameters.pula)]
+        nowe_pokolenie = [[0] * Parametery.N for _ in range(Parametery.pula)]
 
-        for i in range(Parameters.pula):
+        for i in range(Parametery.pula):
             j = 0
             while losowe[i] > ruletka[j]:
                 j += 1
@@ -93,40 +93,40 @@ class Population:
         self.populacja = nowe_pokolenie
 
     def krzyzowanie(self):
-        liczba_par = Parameters.pula // 2
+        liczba_par = Parametery.pula // 2
         losowe_pary = [random.randint(0, 99) for _ in range(liczba_par)]
-        losowe_miejsca = [random.randint(0, Parameters.N - 2) for _ in range(liczba_par)]
+        losowe_miejsca = [random.randint(0, Parametery.N - 2) for _ in range(liczba_par)]
 
         pierwszy = 0
         for para in range(liczba_par):
-            if losowe_pary[para] < Parameters.pk * 100:
-                for i in range(losowe_miejsca[para], Parameters.N):
+            if losowe_pary[para] < Parametery.pk * 100:
+                for i in range(losowe_miejsca[para], Parametery.N):
                     self.populacja[pierwszy][i], self.populacja[pierwszy + 1][i] = self.populacja[pierwszy + 1][i], self.populacja[pierwszy][i]
             pierwszy += 2
 
     def mutacje(self):
-        for i in range(Parameters.pula):
-            if random.random() < Parameters.pm:
-                miejsce_mutacji = random.randint(0, Parameters.N - 1)
+        for i in range(Parametery.pula):
+            if random.random() < Parametery.pm:
+                miejsce_mutacji = random.randint(0, Parametery.N - 1)
                 self.populacja[i][miejsce_mutacji] = 1 - self.populacja[i][miejsce_mutacji]
 
     def pokaz_dostosowanie_srednie(self):
-        srednia = sum(self.tablica_dostosowanie) / Parameters.pula
-        Parameters.wykres[Parameters.counter]=srednia
-        Parameters.counter+=1
+        srednia = sum(self.tablica_dostosowanie) / Parametery.pula
+        Parametery.wykres[Parametery.counter]=srednia
+        Parametery.counter+=1
         print(f"{srednia:.2f}")
 
 def main():
     nr_pokolenia = 0
-    liczby_bazowe = BaseNumbers()
+    liczby_bazowe = NumeryBazowe()
     populacja1 = Population()
     populacja2 = Population()
 
     populacja1.losuj_populacje()
-    populacja1.oblicz_fenotypy(Parameters.a1,Parameters.b1)
+    populacja1.oblicz_fenotypy(Parametery.a1, Parametery.b1)
 
     populacja2.losuj_populacje()
-    populacja2.oblicz_fenotypy(Parameters.a2,Parameters.b2)
+    populacja2.oblicz_fenotypy(Parametery.a2, Parametery.b2)
 
     populacja1.oblicz_dostosowanie(populacja2.tablica_fenotypow)
     populacja2.tablica_dostosowanie=populacja1.tablica_dostosowanie
@@ -135,12 +135,12 @@ def main():
     print("Nr pokolenia   Średnia wartość funkcji dostosowania")
     print(f"{nr_pokolenia:3}", end="          ")
     populacja1.pokaz_dostosowanie_srednie()
-    while nr_pokolenia < Parameters.lp:
+    while nr_pokolenia < Parametery.lp:
         nr_pokolenia += 1
         populacja1.ruletka()
         populacja1.krzyzowanie()
         populacja1.mutacje()
-        populacja1.oblicz_fenotypy(Parameters.a1,Parameters.b1)
+        populacja1.oblicz_fenotypy(Parametery.a1, Parametery.b1)
 
 
 
@@ -148,7 +148,7 @@ def main():
         populacja2.ruletka()
         populacja2.krzyzowanie()
         populacja2.mutacje()
-        populacja2.oblicz_fenotypy(Parameters.a2,Parameters.b2)
+        populacja2.oblicz_fenotypy(Parametery.a2, Parametery.b2)
 
         populacja1.oblicz_dostosowanie(populacja2.tablica_fenotypow)
         populacja2.tablica_dostosowanie = populacja1.tablica_dostosowanie
@@ -157,7 +157,7 @@ def main():
 
 
     numbers = np.arange(1, 42)
-    plt.plot(numbers, Parameters.wykres,c = "b")
+    plt.plot(numbers, Parametery.wykres, c ="b")
 
     # Set the title
     plt.title("Algorytm genetyczny dla funkcji   1-Log[10,x^2+cos(y)]  ")
