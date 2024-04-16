@@ -1,1 +1,1 @@
-Algorytm genetyczny szukajcy wartosci max funkcji dla dwoch zmiennych x oraz y. Przyklad z ksiazki
+Algorytm genetyczny szukajcy wartosci max funkcji  dwoch zmiennych x oraz y. Przyklad z ksiazki
